@@ -25,8 +25,8 @@ def filter_by_month(items: list, month: Optional[str]) -> list:
             months = QUARTER_MAP[month]
             return [item for item in items if any(m in item.get('order_date', '') for m in months)]
     else:
-        # Direct month match
-        return [item for item in items if month in item.get('order_date', '')]
+        # Direct month match — use startswith to avoid e.g. "2025-1" matching "2025-10"
+        return [item for item in items if item.get('order_date', '').startswith(month)]
 
     return items
 
@@ -317,18 +317,12 @@ def get_quarterly_reports(
 
     quarters = {}
 
+    month_to_quarter = {m: q for q, months in QUARTER_MAP.items() for m in months}
+
     for order in filtered:
         order_date = order.get('order_date', '')
-        # Determine quarter
-        if '2025-01' in order_date or '2025-02' in order_date or '2025-03' in order_date:
-            quarter = 'Q1-2025'
-        elif '2025-04' in order_date or '2025-05' in order_date or '2025-06' in order_date:
-            quarter = 'Q2-2025'
-        elif '2025-07' in order_date or '2025-08' in order_date or '2025-09' in order_date:
-            quarter = 'Q3-2025'
-        elif '2025-10' in order_date or '2025-11' in order_date or '2025-12' in order_date:
-            quarter = 'Q4-2025'
-        else:
+        quarter = month_to_quarter.get(order_date[:7])
+        if not quarter:
             continue
 
         if quarter not in quarters:
