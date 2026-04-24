@@ -548,4 +548,91 @@ html.dark .error {
   border-color: rgba(239, 68, 68, 0.3);
   color: #fca5a5;
 }
+
+/* ── D1: UI refresh ────────────────────────────────────── */
+
+/* Page fade-in on route change */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.main-content > * {
+  animation: fadeUp 0.22s ease both;
+}
+
+/* Logo accent dot */
+.logo h1::before {
+  content: '';
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  background: var(--accent);
+  border-radius: 2px;
+  margin-right: 0.6rem;
+  vertical-align: middle;
+  margin-bottom: 2px;
+}
+
+/* Page header accent underline */
+.page-header h2 {
+  display: inline-block;
+  padding-bottom: 0.375rem;
+}
+
+.page-header h2::after {
+  content: '';
+  display: block;
+  height: 3px;
+  width: 2.5rem;
+  background: var(--accent);
+  border-radius: 2px;
+  margin-top: 0.375rem;
+  opacity: 0.7;
+}
+
+/* Stat card: colored top accent per semantic type */
+.stat-card { border-top: 3px solid var(--border); }
+.stat-card.warning { border-top-color: #ea580c; }
+.stat-card.success { border-top-color: #059669; }
+.stat-card.danger  { border-top-color: #dc2626; }
+.stat-card.info    { border-top-color: var(--accent); }
+
+/* Card hover: subtle lift */
+.card {
+  transition: box-shadow 0.18s ease, border-color 0.18s ease, transform 0.18s ease;
+}
+
+.card:hover {
+  box-shadow: var(--shadow-md);
+  border-color: var(--border-2);
+  transform: translateY(-1px);
+}
+
+/* Loading: subtle pulse instead of static text */
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
+}
+
+.loading {
+  animation: pulse 1.4s ease-in-out infinite;
+}
+
+/* Active nav: gradient background */
+.nav-tabs a.active {
+  background: linear-gradient(135deg, var(--accent-bg), var(--accent-bg));
+  font-weight: 600;
+}
+
+/* Table row: slightly faster hover */
+tbody tr { transition: background-color 0.1s ease; }
+
+/* Smooth theme switch for all transitionable props */
+.top-nav,
+.card,
+.stat-card,
+.badge {
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+}
 </style>
