@@ -2,7 +2,7 @@
   "mcpServers": {
     "playwright": {
       "type": "stdio",
-      "command": "npx",
+      "command": "C:\\nvm4w\\nodejs\\npx.cmd",
       "args": [
         "-y",
         "@playwright/mcp@0.0.37"
@@ -17,7 +17,7 @@
         "@modelcontextprotocol/server-github"
       ],
       "env": {
-        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_PERSONAL_ACCESS_TOKEN}"
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "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"
       }
     }
   }

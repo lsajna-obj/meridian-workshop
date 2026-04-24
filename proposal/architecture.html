@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Meridian Components — System Architecture</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #0f172a;
+    color: #e2e8f0;
+    min-height: 100vh;
+    padding: 2rem;
+  }
+
+  h1 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #f8fafc;
+    margin-bottom: 0.25rem;
+  }
+
+  .subtitle {
+    color: #64748b;
+    font-size: 0.875rem;
+    margin-bottom: 2.5rem;
+  }
+
+  .arch-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .arch-flow {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr auto 1fr;
+    gap: 0;
+    align-items: start;
+    margin-bottom: 2rem;
+  }
+
+  .flow-arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-top: 2.5rem;
+    color: #475569;
+    font-size: 1.5rem;
+  }
+
+  .card {
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 12px;
+    padding: 1.25rem;
+  }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid #334155;
+  }
+
+  .card-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    flex-shrink: 0;
+  }
+
+  .icon-blue { background: #1d4ed8; }
+  .icon-green { background: #15803d; }
+  .icon-purple { background: #7c3aed; }
+  .icon-amber { background: #b45309; }
+  .icon-slate { background: #334155; }
+  .icon-rose { background: #be123c; }
+
+  .card-title {
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: #f1f5f9;
+    letter-spacing: 0.025em;
+    text-transform: uppercase;
+  }
+
+  .card-port {
+    font-size: 0.75rem;
+    color: #64748b;
+    font-weight: 400;
+    text-transform: none;
+    letter-spacing: 0;
+    margin-left: auto;
+    background: #0f172a;
+    padding: 0.15rem 0.5rem;
+    border-radius: 4px;
+    border: 1px solid #334155;
+  }
+
+  .item-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  .item-list li {
+    font-size: 0.8rem;
+    color: #94a3b8;
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+  }
+
+  .item-list li::before {
+    content: '';
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: #475569;
+    flex-shrink: 0;
+    margin-top: 0.35em;
+  }
+
+  .item-list li strong {
+    color: #cbd5e1;
+    font-weight: 600;
+  }
+
+  .badge {
+    font-size: 0.65rem;
+    padding: 0.1rem 0.4rem;
+    border-radius: 4px;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+
+  .badge-blue { background: #1e3a5f; color: #93c5fd; }
+  .badge-green { background: #14532d; color: #86efac; }
+  .badge-amber { background: #451a03; color: #fcd34d; }
+
+  .section-title {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #475569;
+    margin-bottom: 1rem;
+    margin-top: 2rem;
+  }
+
+  .endpoint-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+  }
+
+  .endpoint {
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    display: flex;
+    align-items: baseline;
+    gap: 0.6rem;
+  }
+
+  .method {
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: #86efac;
+    background: #14532d;
+    padding: 0.1rem 0.4rem;
+    border-radius: 4px;
+    flex-shrink: 0;
+    letter-spacing: 0.05em;
+  }
+
+  .endpoint-path {
+    font-size: 0.8rem;
+    color: #cbd5e1;
+    font-family: 'Fira Code', 'Cascadia Code', monospace;
+    font-weight: 500;
+    flex: 1;
+  }
+
+  .endpoint-params {
+    font-size: 0.7rem;
+    color: #64748b;
+    font-family: monospace;
+    margin-top: 0.2rem;
+  }
+
+  .endpoint-inner {
+    flex: 1;
+  }
+
+  .data-flow-row {
+    display: grid;
+    grid-template-columns: 1fr 60px 1fr;
+    align-items: center;
+    gap: 0;
+    margin-bottom: 1.5rem;
+  }
+
+  .flow-line {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  .flow-line-bar {
+    width: 2px;
+    height: 40px;
+    background: linear-gradient(to bottom, #3b82f6, #8b5cf6);
+  }
+
+  .flow-label {
+    font-size: 0.65rem;
+    color: #64748b;
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  .divider {
+    border: none;
+    border-top: 1px solid #1e293b;
+    margin: 2rem 0;
+  }
+
+  .composable-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .composable {
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 8px;
+    padding: 0.875rem 1rem;
+  }
+
+  .composable-name {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #a78bfa;
+    font-family: monospace;
+    margin-bottom: 0.4rem;
+  }
+
+  .composable-desc {
+    font-size: 0.75rem;
+    color: #64748b;
+    line-height: 1.4;
+  }
+
+  .footer {
+    margin-top: 2.5rem;
+    text-align: center;
+    font-size: 0.75rem;
+    color: #334155;
+  }
+
+  @media (max-width: 900px) {
+    .arch-grid { grid-template-columns: 1fr; }
+    .endpoint-grid { grid-template-columns: 1fr; }
+    .composable-row { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<h1>Meridian Components — System Architecture</h1>
+<p class="subtitle">Current-state technical overview · Engagement R4 deliverable · April 2026</p>
+
+<!-- Top-level 3-column: Browser | HTTP | FastAPI | Files -->
+<p class="section-title">System Overview</p>
+<div style="display:grid; grid-template-columns: 1fr 40px 1fr 40px 1fr; gap:0; align-items:start; margin-bottom:2rem;">
+
+  <!-- Frontend -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon icon-blue">🖥</div>
+      <span class="card-title">Frontend</span>
+      <span class="card-port">:3000</span>
+    </div>
+    <ul class="item-list">
+      <li><strong>Vue 3</strong> — Composition API, Options API removed</li>
+      <li><strong>Vue Router</strong> — client-side SPA routing</li>
+      <li><strong>Vite</strong> — dev server &amp; build tool</li>
+      <li><strong>Axios</strong> — HTTP client (centralized in api.js)</li>
+      <li><strong>i18n</strong> — EN / JA with locale composable</li>
+      <li><strong>Playwright</strong> — e2e test suite (36 tests)</li>
+    </ul>
+  </div>
+
+  <!-- Arrow -->
+  <div class="flow-arrow">⇄</div>
+
+  <!-- Backend -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon icon-green">⚙</div>
+      <span class="card-title">Backend</span>
+      <span class="card-port">:8001</span>
+    </div>
+    <ul class="item-list">
+      <li><strong>FastAPI</strong> — async REST API</li>
+      <li><strong>Pydantic</strong> — request/response validation</li>
+      <li><strong>Uvicorn</strong> — ASGI server</li>
+      <li><strong>CORS</strong> — open (dev); restrict in prod</li>
+      <li><strong>No database</strong> — JSON flat files loaded at startup</li>
+      <li><strong>No auth</strong> — demo only; add before prod</li>
+    </ul>
+  </div>
+
+  <!-- Arrow -->
+  <div class="flow-arrow">⇄</div>
+
+  <!-- Data layer -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon icon-amber">📦</div>
+      <span class="card-title">Data Layer</span>
+      <span class="card-port">JSON</span>
+    </div>
+    <ul class="item-list">
+      <li><strong>inventory.json</strong> — SKUs, stock, costs</li>
+      <li><strong>orders.json</strong> — orders with warehouse &amp; category</li>
+      <li><strong>demand_forecasts.json</strong> — trend &amp; forecast per SKU</li>
+      <li><strong>backlog_items.json</strong> — fulfillment gaps</li>
+      <li><strong>purchase_orders.json</strong> — linked to backlog</li>
+      <li><strong>spending.json / transactions.json</strong> — finance</li>
+    </ul>
+  </div>
+</div>
+
+<!-- Vue Views -->
+<p class="section-title">Frontend Views (client/src/views/)</p>
+<div class="arch-grid">
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon icon-blue">📊</div>
+      <span class="card-title">Dashboard.vue</span>
+    </div>
+    <ul class="item-list">
+      <li>KPI cards (turnover, fill rate, revenue, processing time)</li>
+      <li>Order Health table with status breakdown</li>
+      <li>Inventory Value by Category bar chart</li>
+      <li>Inventory Shortages table (backlog-driven)</li>
+      <li>Top Products by Revenue table</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon icon-blue">🗃</div>
+      <span class="card-title">Inventory.vue</span>
+    </div>
+    <ul class="item-list">
+      <li>Stock levels table with search &amp; sort</li>
+      <li>Warehouse + category filter (global)</li>
+      <li>Stock status badges (In Stock / Adequate / Low Stock)</li>
+      <li>Row click → InventoryDetailModal</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon icon-blue">📋</div>
+      <span class="card-title">Orders.vue</span>
+    </div>
+    <ul class="item-list">
+      <li>Orders table with all filter dimensions</li>
+      <li>Status summary cards (Delivered / Shipped / Processing / Backordered)</li>
+      <li>Row click → order detail modal</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon icon-blue">📈</div>
+      <span class="card-title">Reports.vue</span>
+    </div>
+    <ul class="item-list">
+      <li>Quarterly Performance table (revenue, fulfillment rate)</li>
+      <li>Monthly Revenue Trend bar chart</li>
+      <li>Month-over-Month Analysis with growth rates</li>
+      <li>Summary stat cards (YTD revenue, best quarter)</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon icon-rose">🛒</div>
+      <span class="card-title">RestockingView.vue</span>
+      <span class="badge badge-green" style="margin-left:auto">NEW — R2</span>
+    </div>
+    <ul class="item-list">
+      <li>Recommendations table: priority, SKU, order qty, cost</li>
+      <li>Local budget ceiling input (not a global filter)</li>
+      <li>Priority badges: High / Medium / Low</li>
+      <li>Trend badges: increasing / stable / decreasing</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon icon-purple">💰</div>
+      <span class="card-title">Other Views</span>
+    </div>
+    <ul class="item-list">
+      <li><strong>Demand.vue</strong> — demand forecasts by SKU</li>
+      <li><strong>Backlog.vue</strong> — backlog items, PO linking</li>
+      <li><strong>Spending.vue</strong> — finance dashboard, cost breakdown</li>
+    </ul>
+  </div>
+</div>
+
+<!-- Composables -->
+<p class="section-title">Shared Composables (client/src/composables/)</p>
+<div class="composable-row">
+  <div class="composable">
+    <div class="composable-name">useFilters.js</div>
+    <div class="composable-desc">Module-level singleton refs for period, location, category, and status. All views and FilterBar share the same reactive state. <code>getCurrentFilters()</code> serialises to API params.</div>
+  </div>
+  <div class="composable">
+    <div class="composable-name">useI18n.js</div>
+    <div class="composable-desc">EN/JA locale lookup via nested key paths. Exposes <code>t(key)</code>, <code>currentCurrency</code> (USD/JPY), and helper methods for translating warehouse and product names.</div>
+  </div>
+  <div class="composable">
+    <div class="composable-name">useAuth.js</div>
+    <div class="composable-desc">User profile state, task list management, and language/currency switching. Wired to ProfileMenu and LanguageSwitcher components in the header.</div>
+  </div>
+</div>
+
+<!-- API Endpoints -->
+<p class="section-title">API Endpoints (server/main.py)</p>
+<div class="endpoint-grid">
+
+  <div class="endpoint">
+    <span class="method">GET</span>
+    <div class="endpoint-inner">
+      <div class="endpoint-path">/api/inventory</div>
+      <div class="endpoint-params">?warehouse &amp;category</div>
+    </div>
+  </div>
+
+  <div class="endpoint">
+    <span class="method">GET</span>
+    <div class="endpoint-inner">
+      <div class="endpoint-path">/api/inventory/{id}</div>
+      <div class="endpoint-params">single item detail</div>
+    </div>
+  </div>
+
+  <div class="endpoint">
+    <span class="method">GET</span>
+    <div class="endpoint-inner">
+      <div class="endpoint-path">/api/orders</div>
+      <div class="endpoint-params">?warehouse &amp;category &amp;status &amp;month</div>
+    </div>
+  </div>
+
+  <div class="endpoint">
+    <span class="method">GET</span>
+    <div class="endpoint-inner">
+      <div class="endpoint-path">/api/orders/{id}</div>
+      <div class="endpoint-params">single order detail</div>
+    </div>
+  </div>
+
+  <div class="endpoint">
+    <span class="method">GET</span>
+    <div class="endpoint-inner">
+      <div class="endpoint-path">/api/dashboard/summary</div>
+      <div class="endpoint-params">?warehouse &amp;category &amp;status &amp;month</div>
+    </div>
+  </div>
+
+  <div class="endpoint">
+    <span class="method">GET</span>
+    <div class="endpoint-inner">
+      <div class="endpoint-path">/api/demand</div>
+      <div class="endpoint-params">demand forecasts (no filter)</div>
+    </div>
+  </div>
+
+  <div class="endpoint">
+    <span class="method">GET</span>
+    <div class="endpoint-inner">
+      <div class="endpoint-path">/api/backlog</div>
+      <div class="endpoint-params">backlog + PO status flag</div>
+    </div>
+  </div>
+
+  <div class="endpoint">
+    <span class="method">GET</span>
+    <div class="endpoint-inner">
+      <div class="endpoint-path">/api/restocking</div>
+      <div class="endpoint-params">?warehouse &amp;category &amp;budget  <span class="badge badge-green">NEW</span></div>
+    </div>
+  </div>
+
+  <div class="endpoint">
+    <span class="method">GET</span>
+    <div class="endpoint-inner">
+      <div class="endpoint-path">/api/reports/quarterly</div>
+      <div class="endpoint-params">?warehouse &amp;category &amp;month</div>
+    </div>
+  </div>
+
+  <div class="endpoint">
+    <span class="method">GET</span>
+    <div class="endpoint-inner">
+      <div class="endpoint-path">/api/reports/monthly-trends</div>
+      <div class="endpoint-params">?warehouse &amp;category &amp;month</div>
+    </div>
+  </div>
+
+  <div class="endpoint">
+    <span class="method">GET</span>
+    <div class="endpoint-inner">
+      <div class="endpoint-path">/api/spending/*</div>
+      <div class="endpoint-params">summary · monthly · categories · transactions</div>
+    </div>
+  </div>
+
+  <div class="endpoint">
+    <span class="method">POST</span>
+    <div class="endpoint-inner">
+      <div class="endpoint-path">/api/purchase-orders</div>
+      <div class="endpoint-params">create PO from backlog item</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Filter propagation -->
+<p class="section-title">Filter Propagation Pattern</p>
+<div class="card" style="max-width: 700px;">
+  <ul class="item-list" style="gap: 0.6rem;">
+    <li><strong>FilterBar.vue</strong> binds to singleton refs in <code>useFilters</code> via <code>v-model</code></li>
+    <li>Every view calls <code>useFilters()</code> and watches the same refs → <code>watch([selectedLocation, selectedCategory, ...], loadData)</code></li>
+    <li>On change, <code>getCurrentFilters()</code> serialises the active refs to an object passed to <code>api.*</code></li>
+    <li>Each <code>api.*</code> method appends only non-<code>'all'</code> values as URL query params via <code>URLSearchParams</code></li>
+    <li>Backend <code>apply_filters()</code> and <code>filter_by_month()</code> do case-insensitive matching, skip when value is absent or <code>'all'</code></li>
+  </ul>
+</div>
+
+<!-- Known gaps -->
+<p class="section-title">Known Gaps (production readiness)</p>
+<div style="display:grid; grid-template-columns: 1fr 1fr; gap: 1rem; max-width: 700px;">
+  <div class="card">
+    <ul class="item-list">
+      <li><strong>No auth</strong> — add JWT/OAuth before any external access</li>
+      <li><strong>No database</strong> — JSON files don't persist mutations</li>
+      <li><strong>CORS wildcard</strong> — restrict to known origins in prod</li>
+    </ul>
+  </div>
+  <div class="card">
+    <ul class="item-list">
+      <li><strong>No pagination</strong> — all data loaded per request</li>
+      <li><strong>No rate limiting</strong> — add nginx or FastAPI middleware</li>
+      <li><strong>No HTTPS</strong> — TLS termination required at load balancer</li>
+    </ul>
+  </div>
+</div>
+
+<p class="footer">Meridian Components — Engagement R4 · Generated April 2026 · Accenture delivery team</p>
+
+</body>
+</html>

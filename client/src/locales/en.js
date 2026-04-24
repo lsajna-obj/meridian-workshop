@@ -6,6 +6,8 @@ export default {
     orders: 'Orders',
     finance: 'Finance',
     demandForecast: 'Demand Forecast',
+    restocking: 'Restocking',
+    reports: 'Reports',
     companyName: 'Catalyst Components',
     subtitle: 'Inventory Management System'
   },
@@ -185,6 +187,59 @@ export default {
       change: 'Change',
       trend: 'Trend',
       period: 'Period'
+    }
+  },
+
+  // Restocking
+  restocking: {
+    title: 'Restocking Recommendations',
+    description: 'Recommended purchase orders based on stock levels and demand forecast',
+    budgetLabel: 'Budget Ceiling ($)',
+    budgetPlaceholder: 'Enter budget ceiling...',
+    applyBudget: 'Apply',
+    clearBudget: 'Clear',
+    totalRecommendations: 'Recommendations',
+    totalEstimatedCost: 'Total Estimated Cost',
+    withinBudget: 'Within Budget',
+    noBudgetSet: 'No budget set — showing all items needing restock',
+    noRecommendations: 'No restocking needed for current filters',
+    table: {
+      sku: 'SKU',
+      itemName: 'Item Name',
+      category: 'Category',
+      warehouse: 'Warehouse',
+      currentStock: 'Current Stock',
+      reorderPoint: 'Reorder Point',
+      recommendedOrder: 'Recommended Order',
+      estimatedCost: 'Est. Cost',
+      forecastedDemand: 'Forecasted Demand',
+      trend: 'Trend',
+      priority: 'Priority'
+    }
+  },
+
+  // Reports
+  reports: {
+    title: 'Performance Reports',
+    description: 'View quarterly performance metrics and monthly trends',
+    quarterlyPerformance: 'Quarterly Performance',
+    monthlyRevenueTrend: 'Monthly Revenue Trend',
+    monthOverMonth: 'Month-over-Month Analysis',
+    totalRevenueYTD: 'Total Revenue (YTD)',
+    avgMonthlyRevenue: 'Avg Monthly Revenue',
+    totalOrdersYTD: 'Total Orders (YTD)',
+    bestPerformingQuarter: 'Best Performing Quarter',
+    table: {
+      quarter: 'Quarter',
+      totalOrders: 'Total Orders',
+      totalRevenue: 'Total Revenue',
+      avgOrderValue: 'Avg Order Value',
+      fulfillmentRate: 'Fulfillment Rate',
+      month: 'Month',
+      orders: 'Orders',
+      revenue: 'Revenue',
+      change: 'Change',
+      growthRate: 'Growth Rate'
     }
   },
 

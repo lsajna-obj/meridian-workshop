@@ -227,13 +227,97 @@ def get_recent_transactions():
     """Get recent transactions"""
     return recent_transactions
 
+class RestockingRecommendation(BaseModel):
+    sku: str
+    name: str
+    category: str
+    warehouse: str
+    current_stock: int
+    reorder_point: int
+    recommended_order: int
+    unit_cost: float
+    estimated_cost: float
+    forecasted_demand: int
+    trend: str
+    priority: str
+
+@app.get("/api/restocking", response_model=List[RestockingRecommendation])
+def get_restocking_recommendations(
+    warehouse: Optional[str] = None,
+    category: Optional[str] = None,
+    budget: Optional[float] = None
+):
+    """Get restocking recommendations based on stock levels and demand forecasts."""
+    filtered_items = apply_filters(inventory_items, warehouse, category)
+    demand_lookup = {f['item_sku']: f for f in demand_forecasts}
+
+    recommendations = []
+    for item in filtered_items:
+        forecast = demand_lookup.get(item['sku'])
+        forecasted_demand = forecast['forecasted_demand'] if forecast else 0
+        trend = forecast['trend'] if forecast else 'stable'
+        qty = item['quantity_on_hand']
+        reorder = item['reorder_point']
+
+        below_reorder = qty < reorder
+        demand_gap = forecasted_demand > qty
+        increasing = trend == 'increasing'
+
+        if below_reorder:
+            recommended_order = (reorder - qty) + forecasted_demand
+            priority = 'high' if (qty == 0 or increasing) else 'medium'
+        elif increasing and demand_gap:
+            recommended_order = forecasted_demand - qty
+            priority = 'low'
+        else:
+            continue
+
+        estimated_cost = round(recommended_order * item['unit_cost'], 2)
+        recommendations.append({
+            'sku': item['sku'],
+            'name': item['name'],
+            'category': item['category'],
+            'warehouse': item['warehouse'],
+            'current_stock': qty,
+            'reorder_point': reorder,
+            'recommended_order': recommended_order,
+            'unit_cost': item['unit_cost'],
+            'estimated_cost': estimated_cost,
+            'forecasted_demand': forecasted_demand,
+            'trend': trend,
+            'priority': priority,
+        })
+
+    priority_order = {'high': 0, 'medium': 1, 'low': 2}
+    recommendations.sort(key=lambda r: (priority_order[r['priority']], -r['estimated_cost']))
+
+    if budget is not None:
+        capped, running = [], 0.0
+        for rec in recommendations:
+            if running + rec['estimated_cost'] <= budget:
+                capped.append(rec)
+                running += rec['estimated_cost']
+        recommendations = capped
+
+    return recommendations
+
 @app.get("/api/reports/quarterly")
-def get_quarterly_reports():
+def get_quarterly_reports(
+    warehouse: Optional[str] = None,
+    category: Optional[str] = None,
+    month: Optional[str] = None
+):
     """Get quarterly performance reports"""
-    # Calculate quarterly statistics from orders
+    filtered = orders
+    if warehouse and warehouse != 'all':
+        filtered = [o for o in filtered if o.get('warehouse') == warehouse]
+    if category and category != 'all':
+        filtered = [o for o in filtered if o.get('category', '').lower() == category.lower()]
+    filtered = filter_by_month(filtered, month)
+
     quarters = {}
 
-    for order in orders:
+    for order in filtered:
         order_date = order.get('order_date', '')
         # Determine quarter
         if '2025-01' in order_date or '2025-02' in order_date or '2025-03' in order_date:
@@ -274,11 +358,22 @@ def get_quarterly_reports():
     return result
 
 @app.get("/api/reports/monthly-trends")
-def get_monthly_trends():
+def get_monthly_trends(
+    warehouse: Optional[str] = None,
+    category: Optional[str] = None,
+    month: Optional[str] = None
+):
     """Get month-over-month trends"""
+    filtered = orders
+    if warehouse and warehouse != 'all':
+        filtered = [o for o in filtered if o.get('warehouse') == warehouse]
+    if category and category != 'all':
+        filtered = [o for o in filtered if o.get('category', '').lower() == category.lower()]
+    filtered = filter_by_month(filtered, month)
+
     months = {}
 
-    for order in orders:
+    for order in filtered:
         order_date = order.get('order_date', '')
         if not order_date:
             continue
