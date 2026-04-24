@@ -6,7 +6,9 @@ export default {
     orders: '注文',
     finance: '財務',
     demandForecast: '需要予測',
-    companyName: '触媒コンポーネンツ',
+    restocking: '再入荷',
+    reports: 'レポート',
+    companyName: 'メリディアン コンポーネンツ',
     subtitle: '在庫管理システム'
   },
 
@@ -188,6 +190,59 @@ export default {
     }
   },
 
+  // Restocking
+  restocking: {
+    title: '再入荷推奨',
+    description: '在庫レベルと需要予測に基づく発注推奨',
+    budgetLabel: '予算上限（$）',
+    budgetPlaceholder: '予算上限を入力...',
+    applyBudget: '適用',
+    clearBudget: 'クリア',
+    totalRecommendations: '推奨件数',
+    totalEstimatedCost: '推定総費用',
+    withinBudget: '予算内',
+    noBudgetSet: '予算未設定 — 再入荷が必要なすべての品目を表示',
+    noRecommendations: '現在のフィルターでは再入荷不要',
+    table: {
+      sku: 'SKU',
+      itemName: '品目名',
+      category: 'カテゴリ',
+      warehouse: '倉庫',
+      currentStock: '現在の在庫',
+      reorderPoint: '再注文点',
+      recommendedOrder: '推奨注文数',
+      estimatedCost: '推定費用',
+      forecastedDemand: '予測需要',
+      trend: 'トレンド',
+      priority: '優先度'
+    }
+  },
+
+  // Reports
+  reports: {
+    title: 'パフォーマンスレポート',
+    description: '四半期業績指標と月次トレンドを表示',
+    quarterlyPerformance: '四半期業績',
+    monthlyRevenueTrend: '月次収益トレンド',
+    monthOverMonth: '前月比分析',
+    totalRevenueYTD: '総収益（年初来）',
+    avgMonthlyRevenue: '月平均収益',
+    totalOrdersYTD: '総注文数（年初来）',
+    bestPerformingQuarter: '最高業績四半期',
+    table: {
+      quarter: '四半期',
+      totalOrders: '総注文数',
+      totalRevenue: '総収益',
+      avgOrderValue: '平均注文額',
+      fulfillmentRate: '履行率',
+      month: '月',
+      orders: '注文数',
+      revenue: '収益',
+      change: '変化',
+      growthRate: '成長率'
+    }
+  },
+
   // Filters
   filters: {
     timePeriod: '期間',
@@ -324,6 +379,37 @@ export default {
     filter: 'フィルター',
     export: 'エクスポート',
     items: '件'
+  },
+
+  // Backlog
+  backlog: {
+    title: 'バックログ管理',
+    description: '在庫不足の追跡と解決',
+    highPriority: '高優先度',
+    mediumPriority: '中優先度',
+    lowPriority: '低優先度',
+    totalItems: 'バックログアイテム合計',
+    cardTitle: 'バックログアイテム',
+    noItems: '未処理なし — 全注文を履行可能です！',
+    unitsShort: '個不足',
+    days: '日',
+    table: {
+      orderId: '注文ID',
+      sku: 'SKU',
+      itemName: 'アイテム名',
+      quantityNeeded: '必要数量',
+      quantityAvailable: '利用可能数量',
+      shortage: '不足',
+      daysDelayed: '遅延日数',
+      priority: '優先度'
+    }
+  },
+
+  // Theme
+  theme: {
+    dark: 'ダークモード',
+    light: 'ライトモード',
+    toggle: 'テーマ切替'
   },
 
   // Product Names

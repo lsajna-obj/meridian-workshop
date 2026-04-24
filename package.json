@@ -1,0 +1,28 @@
+{
+  "name": "meridian-workshop",
+  "version": "1.0.0",
+  "description": "A Claude Code workshop. You're a consultant responding to an RFP, then delivering the engagement.",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs",
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "npx playwright test",
+    "test:report": "npx playwright show-report"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lsajna-obj/meridian-workshop.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/lsajna-obj/meridian-workshop/issues"
+  },
+  "homepage": "https://github.com/lsajna-obj/meridian-workshop#readme",
+  "devDependencies": {
+    "@playwright/test": "^1.59.1"
+  }
+}
