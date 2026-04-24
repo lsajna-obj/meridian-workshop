@@ -8,7 +8,7 @@ export default {
     demandForecast: '需要予測',
     restocking: '再入荷',
     reports: 'レポート',
-    companyName: '触媒コンポーネンツ',
+    companyName: 'メリディアン コンポーネンツ',
     subtitle: '在庫管理システム'
   },
 

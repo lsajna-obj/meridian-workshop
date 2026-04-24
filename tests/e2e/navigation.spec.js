@@ -6,7 +6,7 @@ test.describe('Navigation', () => {
   })
 
   test('renders app header with company name', async ({ page }) => {
-    await expect(page.getByRole('heading', { name: 'Catalyst Components' })).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Meridian Components' })).toBeVisible()
     await expect(page.getByText('Inventory Management System')).toBeVisible()
   })
 
