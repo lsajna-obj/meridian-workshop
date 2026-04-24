@@ -381,6 +381,37 @@ export default {
     items: '件'
   },
 
+  // Backlog
+  backlog: {
+    title: 'バックログ管理',
+    description: '在庫不足の追跡と解決',
+    highPriority: '高優先度',
+    mediumPriority: '中優先度',
+    lowPriority: '低優先度',
+    totalItems: 'バックログアイテム合計',
+    cardTitle: 'バックログアイテム',
+    noItems: '未処理なし — 全注文を履行可能です！',
+    unitsShort: '個不足',
+    days: '日',
+    table: {
+      orderId: '注文ID',
+      sku: 'SKU',
+      itemName: 'アイテム名',
+      quantityNeeded: '必要数量',
+      quantityAvailable: '利用可能数量',
+      shortage: '不足',
+      daysDelayed: '遅延日数',
+      priority: '優先度'
+    }
+  },
+
+  // Theme
+  theme: {
+    dark: 'ダークモード',
+    light: 'ライトモード',
+    toggle: 'テーマ切替'
+  },
+
   // Product Names
   productNames: {
     'Single Layer PCB Assembly': '単層PCB組立',
