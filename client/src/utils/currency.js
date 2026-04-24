@@ -20,9 +20,3 @@ export function formatCurrencyWithDecimals(amount, currency = 'USD', decimals = 
   return `$${amount.toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals })}`
 }
 
-export function convertAmount(amount, currency = 'USD') {
-  if (currency === 'JPY') {
-    return Math.round(amount * USD_TO_JPY)
-  }
-  return amount
-}

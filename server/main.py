@@ -169,15 +169,11 @@ def get_demand_forecasts():
 @app.get("/api/backlog", response_model=List[BacklogItem])
 def get_backlog():
     """Get backlog items with purchase order status"""
-    # Add has_purchase_order flag to each backlog item
-    result = []
-    for item in backlog_items:
-        item_dict = dict(item)
-        # Check if this backlog item has a purchase order
-        has_po = any(po["backlog_item_id"] == item["id"] for po in purchase_orders)
-        item_dict["has_purchase_order"] = has_po
-        result.append(item_dict)
-    return result
+    po_backlog_ids = {po["backlog_item_id"] for po in purchase_orders}
+    return [
+        {**item, "has_purchase_order": item["id"] in po_backlog_ids}
+        for item in backlog_items
+    ]
 
 @app.get("/api/dashboard/summary")
 def get_dashboard_summary(
@@ -248,6 +244,8 @@ def get_restocking_recommendations(
     budget: Optional[float] = None
 ):
     """Get restocking recommendations based on stock levels and demand forecasts."""
+    if budget is not None and budget < 0:
+        raise HTTPException(status_code=400, detail="Budget must be non-negative")
     filtered_items = apply_filters(inventory_items, warehouse, category)
     demand_lookup = {f['item_sku']: f for f in demand_forecasts}
 
@@ -308,11 +306,7 @@ def get_quarterly_reports(
     month: Optional[str] = None
 ):
     """Get quarterly performance reports"""
-    filtered = orders
-    if warehouse and warehouse != 'all':
-        filtered = [o for o in filtered if o.get('warehouse') == warehouse]
-    if category and category != 'all':
-        filtered = [o for o in filtered if o.get('category', '').lower() == category.lower()]
+    filtered = apply_filters(orders, warehouse, category)
     filtered = filter_by_month(filtered, month)
 
     quarters = {}
@@ -358,11 +352,7 @@ def get_monthly_trends(
     month: Optional[str] = None
 ):
     """Get month-over-month trends"""
-    filtered = orders
-    if warehouse and warehouse != 'all':
-        filtered = [o for o in filtered if o.get('warehouse') == warehouse]
-    if category and category != 'all':
-        filtered = [o for o in filtered if o.get('category', '').lower() == category.lower()]
+    filtered = apply_filters(orders, warehouse, category)
     filtered = filter_by_month(filtered, month)
 
     months = {}
@@ -372,21 +362,20 @@ def get_monthly_trends(
         if not order_date:
             continue
 
-        # Extract month (format: YYYY-MM-DD)
-        month = order_date[:7]  # Gets YYYY-MM
+        order_month = order_date[:7]  # Gets YYYY-MM
 
-        if month not in months:
-            months[month] = {
-                'month': month,
+        if order_month not in months:
+            months[order_month] = {
+                'month': order_month,
                 'order_count': 0,
                 'revenue': 0,
                 'delivered_count': 0
             }
 
-        months[month]['order_count'] += 1
-        months[month]['revenue'] += order.get('total_value', 0)
+        months[order_month]['order_count'] += 1
+        months[order_month]['revenue'] += order.get('total_value', 0)
         if order.get('status') == 'Delivered':
-            months[month]['delivered_count'] += 1
+            months[order_month]['delivered_count'] += 1
 
     # Convert to list and sort
     result = list(months.values())
